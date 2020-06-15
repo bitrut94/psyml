@@ -9,6 +9,7 @@
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0-preview-06">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="SharpYaml" Version="1.6.6" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 
