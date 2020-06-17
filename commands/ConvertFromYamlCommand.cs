@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System.Collections.Specialized;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using SharpYaml.Serialization;
 
 namespace psyml
@@ -55,16 +54,28 @@ namespace psyml
             if (result is IDictionary)
             {
                 WriteVerbose("Found object: " + result.GetType().ToString());
-                Hashtable new_result = ConvertDictToHashtable((IDictionary)result);
-                WriteObject(new_result);
-                return (new_result != null);
+                if (AsOrderedDictionary.IsPresent) {
+                    OrderedDictionary new_result = ConvertDictToOrderedDict((IDictionary)result);
+                    WriteObject(new_result);
+                    return (new_result != null);
+                } else {
+                    Hashtable new_result = ConvertDictToHashtable((IDictionary)result);
+                    WriteObject(new_result);
+                    return (new_result != null);
+                }
             }
             else if (result is IList)
             {
                 WriteVerbose("Found list: " + result.GetType().ToString());
-                Array new_result = ConvertArrayElementsToHashtable((IList)result);
-                WriteObject(new_result);
-                return (new_result != null);
+                if (AsOrderedDictionary.IsPresent) {
+                    Array new_result = ConvertArrayElementsToOrderedDictionary((IList)result);
+                    WriteObject(new_result);
+                    return (new_result != null);
+                } else {
+                    Array new_result = ConvertArrayElementsToHashtable((IList)result);
+                    WriteObject(new_result);
+                    return (new_result != null);
+                }
             }
             else
             {
@@ -138,6 +149,92 @@ namespace psyml
                     case IDictionary val:
                         {
                             result[i] = ConvertDictToHashtable(val);
+                            break;
+                        }
+                    case int val:
+                        {
+                            result[i] = val;
+                            break;
+                        }
+                    case Boolean val:
+                        {
+                            result[i] = val;
+                            break;
+                        }
+                    case string val:
+                        {
+                            result[i] = val;
+                            break;
+                        }
+                }
+            }
+
+            return result;
+        }
+
+        private OrderedDictionary ConvertDictToOrderedDict(IDictionary dict)
+        {
+            OrderedDictionary result = new OrderedDictionary();
+
+            foreach (var key in dict.Keys)
+            {
+                switch (dict[key])
+                {
+                    case IList val:
+                        {
+                            result.Add(
+                                key,
+                                ConvertArrayElementsToOrderedDictionary(val)
+                            );
+                            break;
+                        }
+                    case IDictionary val:
+                        {
+                            result.Add(
+                                key,
+                                ConvertDictToOrderedDict(val)
+                            );
+                            break;
+                        }
+                    case int val:
+                        {
+                            result.Add(key, val);
+                            break;
+                        }
+                    case Boolean val:
+                        {
+                            result.Add(key, val);
+                            break;
+                        }
+                    case string val:
+                        {
+                            result.Add(key, val);
+                            break;
+                        }
+                }
+            }
+
+            return result;
+        }
+
+        private Array ConvertArrayElementsToOrderedDictionary(IList list)
+        {
+            var result = new object[list.Count];
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                var element = list[i];
+
+                switch (element)
+                {
+                    case IList val:
+                        {
+                            result[i] = ConvertArrayElementsToOrderedDictionary(val);
+                            break;
+                        }
+                    case IDictionary val:
+                        {
+                            result[i] = ConvertDictToOrderedDict(val);
                             break;
                         }
                     case int val:
