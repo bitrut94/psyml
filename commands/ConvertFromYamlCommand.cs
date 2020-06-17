@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Management.Automation;
-using SharpYaml.Serialization;
 
 namespace psyml
 {
@@ -37,53 +36,32 @@ namespace psyml
         {
             if (_inputObjectBuffer.Count > 0)
             {
-                ConvertFromYamlHelper(
-                    string.Join(
-                        System.Environment.NewLine,
-                        _inputObjectBuffer.ToArray()
+                WriteObject(
+                    YamlObject.ConvertFromYaml(
+                        string.Join(
+                            System.Environment.NewLine,
+                            _inputObjectBuffer.ToArray()
+                        ),
+                        GetOutputType()
                     )
                 );
             }
         }
 
-        private bool ConvertFromYamlHelper(string input)
+        private Type GetOutputType()
         {
-            object result = new Serializer()
-                .Deserialize(input);
-
-            if (result is IDictionary)
+            if (AsOrderedDictionary.IsPresent)
             {
-                WriteVerbose("Found object: " + result.GetType().ToString());
-                if (AsOrderedDictionary.IsPresent) {
-                    OrderedDictionary new_result = YamlObject.PopulateOrderedDictionaryFromDictionary((IDictionary)result);
-                    WriteObject(new_result);
-                    return (new_result != null);
-                } else {
-                    Hashtable new_result = YamlObject.PopulateHashtableFromDictionary((IDictionary)result);
-                    WriteObject(new_result);
-                    return (new_result != null);
-                }
+                return typeof(OrderedDictionary);
             }
-            else if (result is IList)
+            else if (AsPSCustomObject.IsPresent)
             {
-                WriteVerbose("Found list: " + result.GetType().ToString());
-                if (AsOrderedDictionary.IsPresent) {
-                    Array new_result = YamlObject.PopulateOrderedDictionaryFromArray((IList)result);
-                    WriteObject(new_result);
-                    return (new_result != null);
-                } else {
-                    Array new_result = YamlObject.PopulateHashtableFromList((IList)result);
-                    WriteObject(new_result);
-                    return (new_result != null);
-                }
+                return typeof(PSCustomObject);
             }
             else
             {
-                WriteVerbose("Unknown type: " + result.GetType().ToString());
+                return typeof(Hashtable);
             }
-
-            WriteObject(result);
-            return (result != null);
         }
     }
 }

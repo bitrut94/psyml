@@ -1,11 +1,42 @@
 using System;
 using System.Collections;
 using System.Collections.Specialized;
+using SharpYaml.Serialization;
 
 namespace psyml
 {
     public static class YamlObject
     {
+        public static object ConvertFromYaml(string input, Type outputType)
+        {
+            object result = new Serializer()
+                .Deserialize(input);
+
+            if (result is IDictionary)
+            {
+                if (outputType.Equals(typeof(OrderedDictionary)))
+                {
+                    return YamlObject.PopulateOrderedDictionaryFromDictionary((IDictionary)result);
+                }
+                else
+                {
+                    return YamlObject.PopulateHashtableFromDictionary((IDictionary)result);
+                }
+            }
+            else if (result is IList)
+            {
+                if (outputType.Equals(typeof(OrderedDictionary)))
+                {
+                    return YamlObject.PopulateOrderedDictionaryFromArray((IList)result);
+                }
+                else
+                {
+                    return YamlObject.PopulateHashtableFromList((IList)result);
+                }
+            }
+
+            return (result != null);
+        }
         public static Hashtable PopulateHashtableFromDictionary(IDictionary dict)
         {
             Hashtable result = new Hashtable();
