@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using SharpYaml.Serialization;
 
 namespace psyml
@@ -20,6 +16,18 @@ namespace psyml
 
         private List<object> _inputObjectBuffer = new List<object>();
 
+        [Parameter()]
+        public SwitchParameter JsonCompatible { get; set; }
+
+        [Parameter()]
+        public SwitchParameter EnableAliases { get; set; }
+
+        [Parameter()]
+        public SwitchParameter EnableTags { get; set; }
+
+        [Parameter()]
+        public SwitchParameter TestParam { get; set; }
+
         protected override void ProcessRecord()
         {
             _inputObjectBuffer.Add(InputObject);
@@ -29,18 +37,21 @@ namespace psyml
         {
             if (_inputObjectBuffer.Count > 0)
             {
-                ConvertToYamlHelper(_inputObjectBuffer[0]);
+                object objectToProcess = (_inputObjectBuffer.Count > 1)
+                ? (_inputObjectBuffer.ToArray() as object) : _inputObjectBuffer[0];
+
+                SerializerSettings settings = new SerializerSettings()
+                {
+                    EmitAlias = EnableAliases.IsPresent,
+                    EmitTags = EnableTags.IsPresent,
+                    EmitShortTypeName = true,
+                    EmitJsonComptible = JsonCompatible.IsPresent,
+                };
+
+                string result = new Serializer(settings).Serialize(objectToProcess);
+
+                WriteObject(result);
             }
-        }
-
-        private bool ConvertToYamlHelper(object input)
-        {
-            string result = new Serializer().Serialize(input);
-
-            Console.WriteLine(result);
-
-            WriteObject(result);
-            return (result != null);
         }
     }
 }
