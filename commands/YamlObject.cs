@@ -1,212 +1,58 @@
 using System;
 using System.Collections;
-using System.Collections.Specialized;
-using SharpYaml.Serialization;
-
+using System.IO;
+using YamlDotNet.RepresentationModel;
 namespace psyml
 {
     public static class YamlObject
     {
-        public static object ConvertFromYaml(string input, Type outputType)
+        public static object ConvertFromYaml(string input)
         {
-            object result = new Serializer()
-                .Deserialize(input);
+            var yaml = new YamlStream();
+            yaml.Load(new StringReader(input));
 
-            if (result is IDictionary)
-            {
-                if (outputType.Equals(typeof(OrderedDictionary)))
-                {
-                    return YamlObject.PopulateOrderedDictionaryFromDictionary((IDictionary)result);
-                }
-                else
-                {
-                    return YamlObject.PopulateHashtableFromDictionary((IDictionary)result);
-                }
-            }
-            else if (result is IList)
-            {
-                if (outputType.Equals(typeof(OrderedDictionary)))
-                {
-                    return YamlObject.PopulateOrderedDictionaryFromArray((IList)result);
-                }
-                else
-                {
-                    return YamlObject.PopulateHashtableFromList((IList)result);
-                }
-            }
-
-            return (result != null);
-        }
-        public static Hashtable PopulateHashtableFromDictionary(IDictionary dict)
-        {
-            Hashtable result = new Hashtable();
-
-            foreach (var key in dict.Keys)
-            {
-                switch (dict[key])
-                {
-                    case IList val:
-                        {
-                            result.Add(
-                                key,
-                                PopulateHashtableFromList(val)
-                            );
-                            break;
-                        }
-                    case IDictionary val:
-                        {
-                            result.Add(
-                                key,
-                                PopulateHashtableFromDictionary(val)
-                            );
-                            break;
-                        }
-                    case int val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                    case Boolean val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                    case string val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                }
-            }
-
-            return result;
+            return PopulateFromYamlNode(yaml.Documents[0].RootNode);
         }
 
-        public static Array PopulateHashtableFromList(IList list)
+        private static object PopulateFromYamlNode(YamlNode node)
         {
-            var result = new object[list.Count];
-
-            for (int i = 0; i < list.Count; i++)
+            switch (node)
             {
-                var element = list[i];
-
-                switch (element)
-                {
-                    case IList val:
-                        {
-                            result[i] = PopulateHashtableFromList(val);
-                            break;
-                        }
-                    case IDictionary val:
-                        {
-                            result[i] = PopulateHashtableFromDictionary(val);
-                            break;
-                        }
-                    case int val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                    case Boolean val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                    case string val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                }
+                case YamlMappingNode mapping:
+                    return PopulateFromMappingNode(mapping);
+                case YamlSequenceNode sequence:
+                    return PopulateFromSequenceNode(sequence);
+                case YamlScalarNode scalar:
+                    return PopulateFromScalarNode(scalar);
+                default:
+                    return node;
             }
-
-            return result;
         }
 
-        public static OrderedDictionary PopulateOrderedDictionaryFromDictionary(IDictionary dict)
+        private static object PopulateFromScalarNode(YamlScalarNode scalar)
         {
-            OrderedDictionary result = new OrderedDictionary();
-
-            foreach (var key in dict.Keys)
-            {
-                switch (dict[key])
-                {
-                    case IList val:
-                        {
-                            result.Add(
-                                key,
-                                PopulateOrderedDictionaryFromArray(val)
-                            );
-                            break;
-                        }
-                    case IDictionary val:
-                        {
-                            result.Add(
-                                key,
-                                PopulateOrderedDictionaryFromDictionary(val)
-                            );
-                            break;
-                        }
-                    case int val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                    case Boolean val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                    case string val:
-                        {
-                            result.Add(key, val);
-                            break;
-                        }
-                }
-            }
-
-            return result;
+            return scalar.Value.ToString();
         }
 
-        public static Array PopulateOrderedDictionaryFromArray(IList list)
+        private static Hashtable PopulateFromMappingNode(YamlMappingNode mapping)
         {
-            var result = new object[list.Count];
+            var output = new Hashtable();
 
-            for (int i = 0; i < list.Count; i++)
+            foreach (var node in mapping)
             {
-                var element = list[i];
-
-                switch (element)
-                {
-                    case IList val:
-                        {
-                            result[i] = PopulateOrderedDictionaryFromArray(val);
-                            break;
-                        }
-                    case IDictionary val:
-                        {
-                            result[i] = PopulateOrderedDictionaryFromDictionary(val);
-                            break;
-                        }
-                    case int val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                    case Boolean val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                    case string val:
-                        {
-                            result[i] = val;
-                            break;
-                        }
-                }
+                output.Add(node.Key.ToString(), PopulateFromYamlNode(node.Value));
             }
+            return output;
+        }
 
-            return result;
+        private static Array PopulateFromSequenceNode(YamlSequenceNode list)
+        {
+            var output = new Object[list.Children.Count];
+            for (int i = 0; i < list.Children.Count; i++)
+            {
+                output[i] = PopulateFromYamlNode(list[i]);
+            }
+            return output;
         }
     }
 }

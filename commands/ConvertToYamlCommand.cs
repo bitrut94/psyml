@@ -25,9 +25,6 @@ namespace psyml
         [Parameter()]
         public SwitchParameter EnableTags { get; set; }
 
-        [Parameter()]
-        public SwitchParameter TestParam { get; set; }
-
         protected override void ProcessRecord()
         {
             _inputObjectBuffer.Add(InputObject);
@@ -48,9 +45,9 @@ namespace psyml
                     EmitJsonComptible = JsonCompatible.IsPresent,
                 };
 
-                string result = new Serializer(settings).Serialize(objectToProcess);
-
-                WriteObject(result);
+                WriteObject(
+                    YamlObject.ConvertToYaml(objectToProcess, settings)
+                );
             }
         }
     }

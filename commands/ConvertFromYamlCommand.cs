@@ -41,26 +41,9 @@ namespace psyml
                         string.Join(
                             System.Environment.NewLine,
                             _inputObjectBuffer.ToArray()
-                        ),
-                        GetOutputType()
+                        )
                     )
                 );
-            }
-        }
-
-        private Type GetOutputType()
-        {
-            if (AsOrderedDictionary.IsPresent)
-            {
-                return typeof(OrderedDictionary);
-            }
-            else if (AsPSCustomObject.IsPresent)
-            {
-                return typeof(PSCustomObject);
-            }
-            else
-            {
-                return typeof(Hashtable);
             }
         }
     }
