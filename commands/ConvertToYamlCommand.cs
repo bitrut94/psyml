@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Management.Automation;
-using SharpYaml.Serialization;
 
 namespace psyml
 {
@@ -22,9 +21,6 @@ namespace psyml
         [Parameter()]
         public SwitchParameter EnableAliases { get; set; }
 
-        [Parameter()]
-        public SwitchParameter EnableTags { get; set; }
-
         protected override void ProcessRecord()
         {
             _inputObjectBuffer.Add(InputObject);
@@ -37,18 +33,20 @@ namespace psyml
                 object objectToProcess = (_inputObjectBuffer.Count > 1)
                 ? (_inputObjectBuffer.ToArray() as object) : _inputObjectBuffer[0];
 
-                SerializerSettings settings = new SerializerSettings()
-                {
-                    EmitAlias = EnableAliases.IsPresent,
-                    EmitTags = EnableTags.IsPresent,
-                    EmitShortTypeName = true,
-                    EmitJsonComptible = JsonCompatible.IsPresent,
-                };
-
-                WriteObject(
-                    YamlObject.ConvertToYaml(objectToProcess, settings)
-                );
+                ConvertToYamlHelper(objectToProcess);
             }
+        }
+
+        private void ConvertToYamlHelper(object input)
+        {
+            var context = new YamlObject.ConvertToYamlContext(
+                disableAliases: EnableAliases,
+                jsonCompatible: JsonCompatible
+            );
+
+            object yaml = YamlObject.ConvertToYaml(input, context);
+
+            WriteObject(yaml);
         }
     }
 }

@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Management.Automation;
 using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+
 namespace psyml
 {
     public static class YamlObject
@@ -138,6 +141,116 @@ namespace psyml
             {
                 output[i] = PopulateFromYamlNode(list[i], context);
             }
+            return output;
+        }
+
+        public readonly struct ConvertToYamlContext
+        {
+            public readonly bool DisableAliases;
+            public readonly bool JsonCompatible;
+            public readonly int MaxRecursion;
+
+            public ConvertToYamlContext(
+                bool disableAliases = true,
+                bool jsonCompatible = false,
+                int maxRecursion = 1024
+            )
+            {
+                this.DisableAliases = disableAliases;
+                this.JsonCompatible = jsonCompatible;
+                this.MaxRecursion = maxRecursion;
+            }
+
+            public ISerializer BuildSerializer()
+            {
+                var serializer = new SerializerBuilder()
+                    .WithMaximumRecursion(this.MaxRecursion);
+
+                if (this.DisableAliases)
+                {
+                    serializer.DisableAliases();
+                }
+                if (this.JsonCompatible)
+                {
+                    serializer.JsonCompatible();
+                }
+
+                return serializer.Build();
+            }
+        }
+
+        public static string ConvertToYaml(
+            object input,
+            ConvertToYamlContext context
+        )
+        {
+            input = PopulateFromObject(input);
+            var serializer = context.BuildSerializer();
+
+            return serializer.Serialize(input);
+        }
+
+        public static object PopulateFromObject(object input)
+        {
+            var pso = input as PSObject;
+
+            if (
+                pso != null &&
+                pso.BaseObject is IDictionary
+            ) {
+                input = pso.BaseObject;
+            }
+
+            switch (input)
+            {
+                case IDictionary dict:
+                    return PopulateFromDictionary(dict);
+                // case OrderedDictionary dict:
+                //     return PopulateFromDictionary(dict);
+                // case Hashtable dict:
+                //     return PopulateFromDictionary(dict);
+                case PSObject obj:
+                    return PopulateFromPSObject(obj);
+                case IList list:
+                    return PopulateFromList(list);
+                default:
+                    return input;
+            }
+        }
+
+        public static Dictionary<string, object> PopulateFromDictionary(IDictionary input)
+        {
+            var output = new Dictionary<string, object>();
+
+            foreach(var key in input.Keys)
+            {
+                output.Add(key.ToString(), PopulateFromObject(input[key]));
+            }
+
+            return output;
+        }
+
+        public static Dictionary<string, object> PopulateFromPSObject(PSObject input)
+        {
+            var output = new Dictionary<string, object>();
+
+            foreach(var property in input.Properties)
+            {
+                output.Add(property.Name.ToString(), PopulateFromObject(property.Value));
+            }
+
+            return output;
+        }
+
+        public static List<object> PopulateFromList(IList list)
+        {
+            var output = new List<object>();
+
+            foreach (var item in list)
+            {
+                output.Add(PopulateFromObject(item));
+            }
+
             return output;
         }
     }
