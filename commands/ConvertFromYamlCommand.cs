@@ -24,9 +24,6 @@ namespace psyml
         [Parameter()]
         public SwitchParameter AsOrderedDictionary { get; set; }
 
-        [Parameter()]
-        public SwitchParameter AsPSCustomObject { get; set; }
-
         protected override void ProcessRecord()
         {
             _inputObjectBuffer.Add(InputObject);
@@ -36,15 +33,43 @@ namespace psyml
         {
             if (_inputObjectBuffer.Count > 0)
             {
-                WriteObject(
-                    YamlObject.ConvertFromYaml(
+                if (_inputObjectBuffer.Count == 1)
+                {
+                    ConvertFromYamlHelper(_inputObjectBuffer[0]);
+                }
+                else
+                {
+                    ConvertFromYamlHelper(
                         string.Join(
                             System.Environment.NewLine,
                             _inputObjectBuffer.ToArray()
                         )
-                    )
-                );
+                    );
+                }
             }
+        }
+
+        private void ConvertFromYamlHelper(string input)
+        {
+            var outputType = typeof(PSObject);
+            if (AsHashtable)
+            {
+                outputType = typeof(Hashtable);
+            }
+            else if (AsOrderedDictionary)
+            {
+                outputType = typeof(OrderedDictionary);
+            }
+
+            var contex = new YamlObject.ConvertFromYamlContext(
+                outputType,
+                false,
+                this
+            );
+
+            object result = YamlObject.ConvertFromYaml(input, contex);
+
+            WriteObject(result);
         }
     }
 }
