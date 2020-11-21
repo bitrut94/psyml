@@ -63,7 +63,17 @@ namespace psyml
             ConvertFromYamlContext context
         )
         {
-            return scalar.Value.ToString();
+            // tag should be handled here
+            if (
+                context.ScalarsAsStrings ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
+            ) {
+                return scalar.Value.ToString();
+            } else {
+                // should recognize type here
+                return scalar.Value;
+            }
         }
 
         private static object PopulateFromMappingNode(
@@ -174,6 +184,8 @@ namespace psyml
                 {
                     serializer.JsonCompatible();
                 }
+
+                serializer.WithEventEmitter(nextEmitter => new QuoteStringIfNeededEmiter(nextEmitter));
 
                 return serializer.Build();
             }
