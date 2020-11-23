@@ -37,7 +37,23 @@ namespace psyml
             var yaml = new YamlStream();
             yaml.Load(new StringReader(input));
 
-            return PopulateFromYamlNode(yaml.Documents[0].RootNode, context);
+            if (yaml.Documents.Count > 1)
+            {
+                var output = new Object[yaml.Documents.Count];
+                for (int i = 0; i < yaml.Documents.Count; i++)
+                {
+                    output[i] = PopulateFromYamlNode(
+                        yaml.Documents[i].RootNode, context
+                    );
+                }
+                return output;
+            }
+            else
+            {
+                return PopulateFromYamlNode(
+                    yaml.Documents[0].RootNode, context
+                );
+            }
         }
 
         private static object PopulateFromYamlNode(
