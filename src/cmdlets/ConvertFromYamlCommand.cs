@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Management.Automation;
@@ -24,6 +23,9 @@ namespace psyml
         [Parameter()]
         public SwitchParameter AsOrderedDictionary { get; set; }
 
+        [Parameter]
+        public SwitchParameter NoEnumerate { get; set; }
+
         protected override void ProcessRecord()
         {
             _inputObjectBuffer.Add(InputObject);
@@ -39,12 +41,31 @@ namespace psyml
                 }
                 else
                 {
-                    ConvertFromYamlHelper(
-                        string.Join(
-                            System.Environment.NewLine,
-                            _inputObjectBuffer.ToArray()
-                        )
-                    );
+                    bool successfullyConverted = true;
+                    try
+                    {
+                        ConvertFromYamlHelper(_inputObjectBuffer[0]);
+                    }
+                    catch
+                    {
+                        successfullyConverted = false;
+                    }
+
+                    if (successfullyConverted)
+                    {
+                        for (int i = 1; i < _inputObjectBuffer.Count; i++)
+                        {
+                            ConvertFromYamlHelper(_inputObjectBuffer[i]);
+                        }
+                    }
+                    else {
+                        ConvertFromYamlHelper(
+                            string.Join(
+                                System.Environment.NewLine,
+                                _inputObjectBuffer.ToArray()
+                            )
+                        );
+                    }
                 }
             }
         }
@@ -69,7 +90,7 @@ namespace psyml
 
             object result = YamlObject.ConvertFromYaml(input, contex);
 
-            WriteObject(result);
+            WriteObject(result, !NoEnumerate.IsPresent);
         }
     }
 }
