@@ -68,9 +68,70 @@ namespace psyml
                 context.ScalarsAsStrings ||
                 scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
                 scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
-            ) {
+            )
+            {
                 return scalar.Value.ToString();
-            } else {
+            }
+            else
+            {
+                var types = new List<Type>(){
+                    typeof(int),
+                    typeof(long),
+                    typeof(double),
+                    typeof(bool),
+                    // typeof(decimal),
+                };
+
+                var convertedValue = new object();
+                foreach (var type in types)
+                {
+                    try
+                    {
+                        convertedValue = System.Convert.ChangeType(scalar.Value, type);
+                        context.Cmdlet.WriteDebug(
+                            String.Format(
+                                "Casted value {0} to type {1}",
+                                scalar.Value.ToString(),
+                                type.ToString()
+                            )
+                        );
+                        break;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+
+                if (object.ReferenceEquals(convertedValue, new object()))
+                {
+                    var outputAsVersion = new Version();
+                    Version.TryParse(scalar.Value, out outputAsVersion);
+                    convertedValue = outputAsVersion;
+                }
+
+                if (Object.Equals(convertedValue, new object()))
+                {
+                    var outputAsDate = new DateTime();
+                    DateTime.TryParse(scalar.Value, out outputAsDate);
+                    convertedValue = outputAsDate;
+                }
+
+                if (String.Equals(convertedValue.ToString().ToLower(), scalar.Value.ToString().ToLower()))
+                {
+                    return convertedValue;
+                }
+                else
+                {
+                    context.Cmdlet.WriteDebug(
+                        String.Format(
+                            "Value {0} got malformed after conversion: {1}",
+                            scalar.Value.ToString(),
+                            convertedValue.ToString()
+                        )
+                    );
+                }
+
                 // should recognize type here
                 return scalar.Value;
             }
@@ -209,7 +270,8 @@ namespace psyml
             if (
                 pso != null &&
                 pso.BaseObject is IDictionary
-            ) {
+            )
+            {
                 input = pso.BaseObject;
             }
 
@@ -217,10 +279,6 @@ namespace psyml
             {
                 case IDictionary dict:
                     return PopulateFromDictionary(dict);
-                // case OrderedDictionary dict:
-                //     return PopulateFromDictionary(dict);
-                // case Hashtable dict:
-                //     return PopulateFromDictionary(dict);
                 case PSObject obj:
                     return PopulateFromPSObject(obj);
                 case IList list:
@@ -234,7 +292,7 @@ namespace psyml
         {
             var output = new Dictionary<string, object>();
 
-            foreach(var key in input.Keys)
+            foreach (var key in input.Keys)
             {
                 output.Add(key.ToString(), PopulateFromObject(input[key]));
             }
@@ -246,7 +304,7 @@ namespace psyml
         {
             var output = new Dictionary<string, object>();
 
-            foreach(var property in input.Properties)
+            foreach (var property in input.Properties)
             {
                 output.Add(property.Name.ToString(), PopulateFromObject(property.Value));
             }
