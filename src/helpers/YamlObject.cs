@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Management.Automation;
+using System.Threading;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
@@ -79,23 +81,46 @@ namespace psyml
             ConvertFromYamlContext context
         )
         {
-            // tag should be handled here
-            if (
-                context.ScalarsAsStrings ||
-                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
-                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
-            )
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(
+                CultureInfo.InvariantCulture.ToString()
+            );
+
+            if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
+            {
+                switch (scalar.Tag)
+                {
+                    case "tag:yaml.org,2002:str":
+                        return scalar.Value.ToString();
+                    case "tag:yaml.org,2002:null":
+                        return null;
+                    case "tag:yaml.org,2002:bool":
+                        return Boolean.Parse(scalar.Value.ToString());
+                    case "tag:yaml.org,2002:int":
+                        return int.Parse(scalar.Value.ToString());
+                    case "tag:yaml.org,2002:float":
+                        return float.Parse(scalar.Value.ToString());
+                    default:
+                        context.Cmdlet.WriteDebug(String.Format(
+                            "Unhandled tag: {0}", scalar.Tag
+                        ));
+                        return scalar.Value.ToString();
+                }
+            }
+            else if (
+              context.ScalarsAsStrings ||
+              scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
+              scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
+          )
             {
                 return scalar.Value.ToString();
             }
             else
             {
                 var types = new List<Type>(){
-                    typeof(int),
-                    typeof(long),
-                    typeof(double),
-                    typeof(bool),
-                    // typeof(decimal),
+                    typeof(Int32),
+                    typeof(Int64),
+                    typeof(Double),
+                    typeof(Boolean)
                 };
 
                 var convertedValue = new object();
@@ -103,7 +128,9 @@ namespace psyml
                 {
                     try
                     {
-                        convertedValue = System.Convert.ChangeType(scalar.Value, type);
+                        convertedValue = System.Convert.ChangeType(
+                            scalar.Value, type
+                        );
                         context.Cmdlet.WriteDebug(
                             String.Format(
                                 "Casted value {0} to type {1}",
@@ -119,20 +146,6 @@ namespace psyml
                     }
                 }
 
-                if (object.ReferenceEquals(convertedValue, new object()))
-                {
-                    var outputAsVersion = new Version();
-                    Version.TryParse(scalar.Value, out outputAsVersion);
-                    convertedValue = outputAsVersion;
-                }
-
-                if (Object.Equals(convertedValue, new object()))
-                {
-                    var outputAsDate = new DateTime();
-                    DateTime.TryParse(scalar.Value, out outputAsDate);
-                    convertedValue = outputAsDate;
-                }
-
                 if (String.Equals(convertedValue.ToString().ToLower(), scalar.Value.ToString().ToLower()))
                 {
                     return convertedValue;
@@ -146,10 +159,8 @@ namespace psyml
                             convertedValue.ToString()
                         )
                     );
+                    return scalar.Value;
                 }
-
-                // should recognize type here
-                return scalar.Value;
             }
         }
 
@@ -180,7 +191,10 @@ namespace psyml
 
             foreach (var node in mapping)
             {
-                output.Add(node.Key.ToString(), PopulateFromYamlNode(node.Value, context));
+                output.Add(
+                    PopulateFromYamlNode(node.Key, context),
+                    PopulateFromYamlNode(node.Value, context)
+                );
             }
             return output;
         }
@@ -194,7 +208,10 @@ namespace psyml
 
             foreach (var node in mapping)
             {
-                output.Add(node.Key.ToString(), PopulateFromYamlNode(node.Value, context));
+                output.Add(
+                    PopulateFromYamlNode(node.Key, context),
+                    PopulateFromYamlNode(node.Value, context)
+                );
             }
             return output;
         }
