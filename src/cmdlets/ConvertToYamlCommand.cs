@@ -13,13 +13,18 @@ namespace psyml
         )]
         public object InputObject { get; set; }
 
-        private List<object> _inputObjectBuffer = new List<object>();
+        private List<object> _inputObjectBuffer;
 
         [Parameter()]
         public SwitchParameter JsonCompatible { get; set; }
 
         [Parameter()]
         public SwitchParameter EnableAliases { get; set; }
+
+        protected override void BeginProcessing()
+        {
+            _inputObjectBuffer = new List<object>();
+        }
 
         protected override void ProcessRecord()
         {

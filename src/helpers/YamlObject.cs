@@ -85,7 +85,11 @@ namespace psyml
                 CultureInfo.InvariantCulture.ToString()
             );
 
-            if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
+            if (String.IsNullOrEmpty(scalar.Value))
+            {
+                return null;
+            }
+            else if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
             {
                 switch (scalar.Tag)
                 {
@@ -99,6 +103,8 @@ namespace psyml
                         return int.Parse(scalar.Value.ToString());
                     case "tag:yaml.org,2002:float":
                         return float.Parse(scalar.Value.ToString());
+                    case "tag:yaml.org,2002:timestamp":
+                        return DateTime.Parse(scalar.Value.ToString());
                     default:
                         context.Cmdlet.WriteDebug(String.Format(
                             "Unhandled tag: {0}", scalar.Tag
@@ -279,7 +285,7 @@ namespace psyml
                     serializer.JsonCompatible();
                 }
 
-                serializer.WithEventEmitter(nextEmitter => new QuoteStringIfNeededEmiter(nextEmitter));
+                serializer.WithEventEmitter(nextEmitter => new TypeRespectingEmitter(nextEmitter));
 
                 return serializer.Build();
             }
@@ -301,8 +307,7 @@ namespace psyml
             var pso = input as PSObject;
 
             if (
-                pso != null &&
-                pso.BaseObject is IDictionary
+                pso != null
             )
             {
                 input = pso.BaseObject;
