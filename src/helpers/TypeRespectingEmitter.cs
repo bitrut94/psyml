@@ -89,7 +89,14 @@ namespace psyml
                 }
             }
 
-            base.Emit(eventInfo, emitter);
+            emitter.Emit(new YamlDotNet.Core.Events.Scalar(
+                anchor: eventInfo.Anchor,
+                tag: eventInfo.Tag,
+                value: eventInfo.RenderedValue,
+                style: eventInfo.Style,
+                isPlainImplicit: eventInfo.IsPlainImplicit,
+                isQuotedImplicit: eventInfo.IsQuotedImplicit
+            ));
         }
 
         private static bool CouldValueBeMissconverted(string value)

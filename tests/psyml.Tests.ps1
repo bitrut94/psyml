@@ -270,10 +270,39 @@ Describe "ConvertFrom-Yaml" {
     }
 }
 
-# Describe "ConvertTo-Yaml" {
-#     Context "ContextName" {
-#         It "ItName" {
-#             Assertion
-#         }
-#     }
-# }
+Describe "ConvertTo-Yaml" {
+    # testing examples from 'Parser tests' in the opposite direction
+    Context "Yaml conversion - collections" {
+        It "Handles sequence of scalars" {
+            $yaml = @"
+- Mark McGwire
+- Sammy Sosa
+- Ken Griffey
+"@
+            @('Mark McGwire', 'Sammy Sosa', 'Ken Griffey') | ConvertTo-Yaml | Should -Match $yaml
+        }
+
+        It "Handles scalars to scalars mapping" {
+            $yaml = @"
+hr:  65    # Home runs
+avg: 0.278 # Batting average
+rbi: 147   # Runs Batted In
+"@
+            [PSCustomObject]@{
+                hr = 65
+                avg = 0.278
+                rbi = 147
+            } | ConvertTo-Yaml | Should -Match $yaml
+            [ordered]@{
+                hr = 65
+                avg = 0.278
+                rbi = 147
+            } | ConvertTo-Yaml | Should -Match $yaml
+            @{
+                hr = 65
+                avg = 0.278
+                rbi = 147
+            } | ConvertTo-Yaml | Should -Match $yaml
+        }
+    }
+}
