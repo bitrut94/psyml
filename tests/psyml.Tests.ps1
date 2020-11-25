@@ -2,7 +2,7 @@
 
 Import-Module $PSScriptRoot/../psyml.psd1 -Force
 
-Describe "Parser tests" {
+Describe "ConvertFrom-Yaml - parser tests" {
     # examples from https://yaml.org/spec/1.2/spec.html
     Context "Yaml conversion - collections" {
         It "Handles sequence of scalars" {
@@ -270,7 +270,7 @@ Describe "ConvertFrom-Yaml" {
     }
 }
 
-Describe "ConvertTo-Yaml" {
+Describe "ConvertTo-Yaml - parser tests" {
     # testing examples from 'Parser tests' in the opposite direction
     Context "Yaml conversion - collections" {
         It "Handles sequence of scalars" {
@@ -284,9 +284,9 @@ Describe "ConvertTo-Yaml" {
 
         It "Handles scalars to scalars mapping" {
             $yaml = @"
-hr:  65    # Home runs
-avg: 0.278 # Batting average
-rbi: 147   # Runs Batted In
+hr: 65
+avg: 0.278
+rbi: 147
 "@
             [PSCustomObject]@{
                 hr = 65
@@ -298,11 +298,92 @@ rbi: 147   # Runs Batted In
                 avg = 0.278
                 rbi = 147
             } | ConvertTo-Yaml | Should -Match $yaml
-            @{
-                hr = 65
-                avg = 0.278
-                rbi = 147
+            # @{
+            #     hr = 65
+            #     avg = 0.278
+            #     rbi = 147
+            # } | ConvertTo-Yaml | Should -Match $yaml
+        }
+
+        It "Handles scalars to sequences mapping" {
+            $yaml = @"
+american:
+- Boston Red Sox
+- Detroit Tigers
+- New York Yankees
+national:
+- New York Mets
+- Chicago Cubs
+- Atlanta Braves
+"@
+
+            [PSCustomObject]@{
+                american = @(
+                    'Boston Red Sox',
+                    'Detroit Tigers',
+                    'New York Yankees'
+                )
+                national = @(
+                    'New York Mets',
+                    'Chicago Cubs',
+                    'Atlanta Braves'
+                )
             } | ConvertTo-Yaml | Should -Match $yaml
+            [ordered]@{
+                american = @(
+                    'Boston Red Sox',
+                    'Detroit Tigers',
+                    'New York Yankees'
+                )
+                national = @(
+                    'New York Mets',
+                    'Chicago Cubs',
+                    'Atlanta Braves'
+                )
+            } | ConvertTo-Yaml | Should -Match $yaml
+        }
+
+                It "Handles sequences mappings" {
+            $yaml = @"
+- name: Mark McGwire
+  hr: 65
+  avg: 0.278
+- name: Sammy Sosa
+  hr: 63
+  avg: 0.288
+"@
+            @(
+                [ordered]@{
+                    name = 'Mark McGwire'
+                    hr = 65
+                    avg = 0.278
+                }
+                [PSCUstomObject]@{
+                    name = 'Sammy Sosa'
+                    hr = 63
+                    avg = 0.288
+                }
+            ) | ConvertTo-Yaml | Should -Match $yaml
+        }
+    }
+}
+
+Describe "ConvertTo-Yaml" {
+    Context "Output type" {
+        It "Returns json compatible output when '-JsonCompatible' is passed" {
+            @{
+                string = 'teststring'
+                int = 1
+                bool = $true
+                nullkey = $null
+                array = @(
+                    1,
+                    'tmp'
+                    @{
+                        nestedItem = $true
+                    }
+                )
+            } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
         }
     }
 }

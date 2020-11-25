@@ -280,12 +280,16 @@ namespace psyml
                 {
                     serializer.DisableAliases();
                 }
+
                 if (this.JsonCompatible)
                 {
                     serializer.JsonCompatible();
                 }
+                else
+                {
+                    serializer.WithEventEmitter(nextEmitter => new TypeRespectingEmitter(nextEmitter));
+                }
 
-                serializer.WithEventEmitter(nextEmitter => new TypeRespectingEmitter(nextEmitter));
 
                 return serializer.Build();
             }
@@ -311,6 +315,14 @@ namespace psyml
             )
             {
                 input = pso.BaseObject;
+
+                if (
+                    input as IEnumerable == null &&
+                    input as IDictionary == null
+                ) {
+                    // it might be pscustomobject
+                    input = pso;
+                }
             }
 
             switch (input)
