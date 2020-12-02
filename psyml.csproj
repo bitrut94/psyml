@@ -14,12 +14,13 @@
     <PackageReference Include="YamlDotNet" Version="9.1.0" />
   </ItemGroup>
 
-  <!-- <Target Name="CopyFiles" AfterTargets="Build">
+  <Target Name="CopyFiles" AfterTargets="Build">
     <Copy SourceFiles="psyml.psd1" DestinationFolder="artifacts" />
     <ItemGroup>
       <OutputAssembly Include="$(TargetDir)\$(AssemblyName).dll" />
+      <OutputAssembly Include="$(TargetDir)\YamlDotNet.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts" />
-  </Target> -->
+  </Target>
 
 </Project>

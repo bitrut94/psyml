@@ -87,6 +87,10 @@ namespace psyml
 
             if (String.IsNullOrEmpty(scalar.Value))
             {
+                return String.Empty;
+            }
+            else if (String.Equals(scalar.Value.ToLower(), "null"))
+            {
                 return null;
             }
             else if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
