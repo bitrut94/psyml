@@ -109,6 +109,11 @@ namespace psyml
                 typeof(DateTime)
             };
 
+            if (String.IsNullOrWhiteSpace(value))
+            {
+                return true;
+            }
+
             foreach (var type in types)
             {
                 try
@@ -116,13 +121,6 @@ namespace psyml
                     var converted = System.Convert.ChangeType(
                         value, type, CultureInfo.InvariantCulture
                     );
-                    if (type == typeof(DateTime))
-                    {
-                        if (!((DateTime)converted).ToString("o", CultureInfo.InvariantCulture).StartsWith(value))
-                        {
-                            continue;
-                        }
-                    }
                     return true;
                 }
                 catch

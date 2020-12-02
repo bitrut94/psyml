@@ -385,5 +385,22 @@ Describe "ConvertTo-Yaml" {
                 )
             } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
         }
+
+        It "Converts '<value>' to '<string>'" -TestCases @(
+            @{ Value = 'samplestring'; String = 'samplestring' }
+            @{ Value = 1; String = '1' }
+            @{ Value = -1; String = '-1' }
+            @{ Value = 1.1; String = '1.1' }
+            @{ Value = -1.1; String = '-1.1' }
+            @{ Value = $true; String = 'true' }
+            @{ Value = 'true'; String = '"true"' }
+            @{ Value = $false; String = 'false' }
+            @{ Value = @{tmp = $null}; String = 'tmp: null' }
+            @{ Value = @{tmp = ''}; String = 'tmp: ""' }
+            @{ Value = @{tmp = ' '}; String = 'tmp: " "' }
+            @{ Value = '2001-12-15T02:59:43.1Z'; String = '"2001-12-15T02:59:43.1Z"' }
+        ) {
+            ConvertTo-Yaml $value | Should -Match $String
+        }
     }
 }

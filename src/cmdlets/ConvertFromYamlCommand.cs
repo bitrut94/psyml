@@ -20,10 +20,11 @@ namespace psyml
         [Parameter()]
         public SwitchParameter AsHashtable { get; set; }
 
+        [Alias("Ordered")]
         [Parameter()]
         public SwitchParameter AsOrderedDictionary { get; set; }
 
-        [Parameter]
+        [Parameter()]
         public SwitchParameter NoEnumerate { get; set; }
 
         protected override void ProcessRecord()

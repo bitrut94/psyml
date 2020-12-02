@@ -6,6 +6,7 @@ namespace psyml
     [Cmdlet(VerbsData.ConvertTo, "Yaml")]
     public class ConvertToYamlCommand : PSCmdlet
     {
+        [Alias("Data")]
         [Parameter(
             Mandatory = true,
             Position = 0,
