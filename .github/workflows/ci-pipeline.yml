@@ -30,7 +30,6 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
             shell: powershell
