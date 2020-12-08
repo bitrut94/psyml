@@ -369,20 +369,38 @@ national:
 
 Describe "ConvertTo-Yaml" {
     Context "Output type" {
-        It "Returns json compatible output when '-JsonCompatible' is passed" {
-            @{
-                string = 'teststring'
-                int = 1
-                bool = $true
-                nullkey = $null
-                array = @(
-                    1,
-                    'tmp'
-                    @{
-                        nestedItem = $true
-                    }
-                )
-            } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
+        if ($PSEdition -eq 'Core') {
+            It "Returns json compatible output when '-JsonCompatible' is passed" {
+                @{
+                    string = 'teststring'
+                    int = 1
+                    bool = $true
+                    nullkey = $null
+                    array = @(
+                        1,
+                        'tmp'
+                        @{
+                            nestedItem = $true
+                        }
+                    )
+                } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
+            }
+        } else {
+            It "Returns json compatible output when '-JsonCompatible' is passed" {
+                @{
+                    string = 'teststring'
+                    int = 1
+                    bool = $true
+                    nullkey = $null
+                    array = @(
+                        1,
+                        'tmp'
+                        @{
+                            nestedItem = $true
+                        }
+                    )
+                } | ConvertTo-Yaml -JsonCompatible | ConvertFrom-Json | Should -Not -Throw
+            }
         }
 
         It "Converts '<value>' to '<string>'" -TestCases @(
