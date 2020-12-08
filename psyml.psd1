@@ -9,13 +9,13 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-# RootModule = ''
+RootModule = 'psyml.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.0.1'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = 'Core', 'Desktop'
 
 # ID used to uniquely identify this module
 GUID = 'a88e2e67-a937-4d98-a4d3-0b03d3ade169'
@@ -66,19 +66,16 @@ Copyright = '(c) bitrut. All rights reserved.'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @(
-    "YamlDotNet.dll",
-    "psyml.dll"
-)
+# NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = '*'
+FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = '*'
+CmdletsToExport = 'ConvertTo-Yaml', 'ConvertFrom-Yaml'
 
 # Variables to export from this module
-VariablesToExport = '*'
+# VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = @()

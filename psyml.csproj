@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net4.8</TargetFrameworks>
     <AssemblyName>psyml</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>8.0</LangVersion>
@@ -16,11 +16,12 @@
 
   <Target Name="CopyFiles" AfterTargets="Build">
     <Copy SourceFiles="psyml.psd1" DestinationFolder="artifacts" />
+    <Copy SourceFiles="psyml.psm1" DestinationFolder="artifacts" />
     <ItemGroup>
       <OutputAssembly Include="$(TargetDir)\$(AssemblyName).dll" />
       <OutputAssembly Include="$(TargetDir)\YamlDotNet.dll" />
     </ItemGroup>
-    <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts" />
+    <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts\$(TargetFramework)" />
   </Target>
 
 </Project>
