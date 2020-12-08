@@ -2,7 +2,7 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [master]
+    branches: [testing-ci]
   pull_request:
     branches: [master]
 
@@ -32,9 +32,9 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            shell: powershell
+            powershell: powershell
           - os: ubuntu-latest
-            shell: pwsh
+            powershell: pwsh
     runs-on: ${{ matrix.os }}
     needs: build
     steps:
@@ -45,7 +45,7 @@ jobs:
           name: psyml
           path: psyml
       - name: Perform Pester tests
-        shell: ${{ matrix.shell }}
+        shell: ${{ matrix.powershell }}
         run: |
           Import-Module ./psyml/psyml
           $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
