@@ -30,11 +30,11 @@ jobs:
   test:
     strategy:
       matrix:
+        shell: [pwsh]
+        os: [windows-latest, ubuntu,latest]
         include:
           - os: windows-latest
-            SHELL: powershell
-          - os: ubuntu-latest
-            SHELL: pwsh
+            shell: powershell
     runs-on: ${{ matrix.os }}
     needs: build
     steps:
@@ -45,7 +45,7 @@ jobs:
           name: psyml
           path: psyml
       - name: Perform Pester tests
-        shell: ${{matrix.SHELL}}
+        shell: ${{ matrix.shell }}
         run: |
           Import-Module ./psyml/psyml
           $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
