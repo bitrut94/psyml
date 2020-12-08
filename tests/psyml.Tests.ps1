@@ -1,6 +1,5 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0" }
-
-Import-Module $PSScriptRoot/../psyml.psd1 -Force
+#Requires -Module psyml
 
 Describe "ConvertFrom-Yaml - parser tests" {
     # examples from https://yaml.org/spec/1.2/spec.html

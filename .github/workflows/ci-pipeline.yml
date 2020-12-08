@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -19,12 +17,44 @@ jobs:
         dotnet-version: 3.1.301
     - name: Install dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build netstandard2.1
       run: dotnet build --configuration Release --no-restore --framework netstandard2.1
-    - name: Build
+    - name: Build net4.8
       run: dotnet build --configuration Release --no-restore --framework net4.8
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: psyml
         path: artifacts/
+
+  tests-powershell:
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download artifact
+      uses: actions/download-artifact@master
+      with:
+        name: psyml
+        path: psyml
+    - name: Perform Pester tests
+      shell: powershell
+      run: |
+        Import-Module ./psyml/psyml
+        ./tests/psyml.Tests.ps1
+
+  tests-pwsh:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download artifact
+      uses: actions/download-artifact@master
+      with:
+        name: psyml
+        path: psyml
+    - name: Perform Pester tests
+      shell: pwsh
+      run: |
+        Import-Module ./psyml/psyml
+        ./tests/psyml.Tests.ps1
