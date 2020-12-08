@@ -2,59 +2,57 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build netstandard2.1
-      run: dotnet build --configuration Release --no-restore --framework netstandard2.1
-    - name: Build net4.8
-      run: dotnet build --configuration Release --no-restore --framework net4.8
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: psyml
-        path: artifacts/
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.301
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build netstandard2.1
+        run: dotnet build --configuration Release --no-restore --framework netstandard2.1
+      - name: Build net4.8
+        run: dotnet build --configuration Release --no-restore --framework net4.8
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: psyml
+          path: artifacts/
 
-  tests-powershell:
-    runs-on: windows-latest
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            shell: powershell
+          - os: ubuntu-latest
+            shell: pwsh
+    runs-on: ${{ matrix.os }}
     needs: build
     steps:
-    - uses: actions/checkout@v2
-    - name: Download artifact
-      uses: actions/download-artifact@master
-      with:
-        name: psyml
-        path: psyml
-    - name: Perform Pester tests
-      shell: powershell
-      run: |
-        Import-Module ./psyml/psyml
-        ./tests/psyml.Tests.ps1
+      - uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@master
+        with:
+          name: psyml
+          path: psyml
+      - name: Perform Pester tests
+        shell: ${{ matrix.shell }}
+        run: |
+          Import-Module ./psyml/psyml
+          $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
 
-  tests-pwsh:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - uses: actions/checkout@v2
-    - name: Download artifact
-      uses: actions/download-artifact@master
-      with:
-        name: psyml
-        path: psyml
-    - name: Perform Pester tests
-      shell: pwsh
-      run: |
-        Import-Module ./psyml/psyml
-        ./tests/psyml.Tests.ps1
+          if ($tests.Failed.Count -gt 0) {
+            Write-Error "There were $($tests.Failed.Count) errors total." -ErrorAction Stop
+          } else {
+            Write-Output "There were $($tests.Failed.Count) errors total."
+          }
