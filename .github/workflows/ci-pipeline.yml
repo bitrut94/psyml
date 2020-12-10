@@ -1,8 +1,6 @@
 name: CI Pipeline
 
 on:
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
 
@@ -30,11 +28,7 @@ jobs:
   test:
     strategy:
       matrix:
-        include:
-          - os: windows-latest
-            shell: powershell
-          - os: ubuntu-latest
-            shell: pwsh
+        os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     needs: build
     steps:
@@ -44,8 +38,22 @@ jobs:
         with:
           name: psyml
           path: psyml
+      # it seems that shell parameter cannot be parametrized
       - name: Perform Pester tests
-        shell: ${{ matrix.shell }}
+        if: matrix.os == 'ubuntu-latest'
+        shell: pwsh
+        run: |
+          Import-Module ./psyml/psyml
+          $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
+
+          if ($tests.Failed.Count -gt 0) {
+            Write-Error "There were $($tests.Failed.Count) errors total." -ErrorAction Stop
+          } else {
+            Write-Output "There were $($tests.Failed.Count) errors total."
+          }
+      - name: Perform Pester tests
+        if: matrix.os == 'windows-latest'
+        shell: powershell
         run: |
           Import-Module ./psyml/psyml
           $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru

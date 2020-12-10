@@ -288,12 +288,12 @@ avg: 0.278
 rbi: 147
 "@
             [PSCustomObject]@{
-                hr = 65
+                hr  = 65
                 avg = 0.278
                 rbi = 147
             } | ConvertTo-Yaml | Should -Match $yaml
             [ordered]@{
-                hr = 65
+                hr  = 65
                 avg = 0.278
                 rbi = 147
             } | ConvertTo-Yaml | Should -Match $yaml
@@ -342,7 +342,7 @@ national:
             } | ConvertTo-Yaml | Should -Match $yaml
         }
 
-                It "Handles sequences mappings" {
+        It "Handles sequences mappings" {
             $yaml = @"
 - name: Mark McGwire
   hr: 65
@@ -354,13 +354,13 @@ national:
             @(
                 [ordered]@{
                     name = 'Mark McGwire'
-                    hr = 65
-                    avg = 0.278
+                    hr   = 65
+                    avg  = 0.278
                 }
                 [PSCUstomObject]@{
                     name = 'Sammy Sosa'
-                    hr = 63
-                    avg = 0.288
+                    hr   = 63
+                    avg  = 0.288
                 }
             ) | ConvertTo-Yaml | Should -Match $yaml
         }
@@ -369,20 +369,40 @@ national:
 
 Describe "ConvertTo-Yaml" {
     Context "Output type" {
-        It "Returns json compatible output when '-JsonCompatible' is passed" {
-            @{
-                string = 'teststring'
-                int = 1
-                bool = $true
-                nullkey = $null
-                array = @(
-                    1,
-                    'tmp'
+        if ($PSEdition -eq 'Core') {
+            It "Returns json compatible output when '-JsonCompatible' is passed" {
+                @{
+                    string  = 'teststring'
+                    int     = 1
+                    bool    = $true
+                    nullkey = $null
+                    array   = @(
+                        1,
+                        'tmp'
+                        @{
+                            nestedItem = $true
+                        }
+                    )
+                } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
+            }
+        } else {
+            It "Returns json compatible output when '-JsonCompatible' is passed" {
+                {
                     @{
-                        nestedItem = $true
-                    }
-                )
-            } | ConvertTo-Yaml -JsonCompatible | Test-Json | Should -Be $true
+                        string  = 'teststring'
+                        int     = 1
+                        bool    = $true
+                        nullkey = $null
+                        array   = @(
+                            1,
+                            'tmp'
+                            @{
+                                nestedItem = $true
+                            }
+                        )
+                    } | ConvertTo-Yaml -JsonCompatible | ConvertFrom-Json
+                } | Should -Not -Throw
+            }
         }
 
         It "Converts '<value>' to '<string>'" -TestCases @(
@@ -394,9 +414,9 @@ Describe "ConvertTo-Yaml" {
             @{ Value = $true; String = 'true' }
             @{ Value = 'true'; String = '"true"' }
             @{ Value = $false; String = 'false' }
-            @{ Value = @{tmp = $null}; String = 'tmp: null' }
-            @{ Value = @{tmp = ''}; String = 'tmp: ""' }
-            @{ Value = @{tmp = ' '}; String = 'tmp: " "' }
+            @{ Value = @{tmp = $null }; String = 'tmp: null' }
+            @{ Value = @{tmp = '' }; String = 'tmp: ""' }
+            @{ Value = @{tmp = ' ' }; String = 'tmp: " "' }
             @{ Value = '2001-12-15T02:59:43.1Z'; String = '"2001-12-15T02:59:43.1Z"' }
         ) {
             ConvertTo-Yaml $value | Should -Match $String
