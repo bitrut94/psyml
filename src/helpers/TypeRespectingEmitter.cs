@@ -7,7 +7,7 @@ using YamlDotNet.Serialization.EventEmitters;
 
 namespace psyml
 {
-    public sealed class TypeRespectingEmitter : ChainedEventEmitter
+    internal sealed class TypeRespectingEmitter : ChainedEventEmitter
     {
         public TypeRespectingEmitter(IEventEmitter nextEmitter)
             : base(nextEmitter)
@@ -135,7 +135,7 @@ namespace psyml
 
     internal static class YamlFormatter
     {
-        public static readonly NumberFormatInfo NumberFormat = new NumberFormatInfo
+        private static readonly NumberFormatInfo NumberFormat = new NumberFormatInfo
         {
             CurrencyDecimalSeparator = ".",
             CurrencyGroupSeparator = "_",

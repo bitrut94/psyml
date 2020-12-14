@@ -14,7 +14,7 @@ try {
 
 try {
     Import-Module $PSScriptRoot/$loadPath/psyml.dll `
-        -ErrorAction Ignore -Global | Out-Null
+        -ErrorAction Ignore | Out-Null
 } catch {
     Write-Verbose $_
 }

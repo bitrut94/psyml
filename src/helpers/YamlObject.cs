@@ -11,7 +11,7 @@ using YamlDotNet.Serialization;
 
 namespace psyml
 {
-    public static class YamlObject
+    internal static class YamlObject
     {
         public readonly struct ConvertFromYamlContext
         {
@@ -310,7 +310,7 @@ namespace psyml
             return serializer.Serialize(input);
         }
 
-        public static object PopulateFromObject(object input)
+        private static object PopulateFromObject(object input)
         {
             var pso = input as PSObject;
 
@@ -342,7 +342,7 @@ namespace psyml
             }
         }
 
-        public static Dictionary<string, object> PopulateFromDictionary(IDictionary input)
+        private static Dictionary<string, object> PopulateFromDictionary(IDictionary input)
         {
             var output = new Dictionary<string, object>();
 
@@ -354,7 +354,7 @@ namespace psyml
             return output;
         }
 
-        public static Dictionary<string, object> PopulateFromPSObject(PSObject input)
+        private static Dictionary<string, object> PopulateFromPSObject(PSObject input)
         {
             var output = new Dictionary<string, object>();
 
@@ -366,7 +366,7 @@ namespace psyml
             return output;
         }
 
-        public static List<object> PopulateFromList(IList list)
+        private static List<object> PopulateFromList(IList list)
         {
             var output = new List<object>();
 
