@@ -3,6 +3,11 @@ name: CI Pipeline
 on:
   pull_request:
     branches: [master]
+  push:
+    branches: [master]
+    paths-ignore:
+      - README.md
+      - .github/*
 
 jobs:
   build:
