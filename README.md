@@ -174,11 +174,12 @@ To report issue, bug or feature request please use the [Issues page][GitHubIssue
 
 ## TODO
 
-- [] release pipeline and first published version in PowerShell Gallery
-- [] yaml tag handling
-- [] `System.DateTime` and `System.Version` types handling
-- [] `Test-Yaml` cmdlet
-- [] `-NoEnumerate` should be fixed
+- [ ] release pipeline and first published version in PowerShell Gallery
+- [ ] update cmdlet usage examples
+- [ ] yaml tag handling
+- [ ] `System.DateTime` and `System.Version` types handling
+- [ ] `Test-Yaml` cmdlet
+- [ ] `-NoEnumerate` should be fixed
 
 
 
