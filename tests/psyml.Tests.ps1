@@ -267,6 +267,34 @@ Describe "ConvertFrom-Yaml" {
             ConvertFrom-Yaml $value | Should -BeOfType $type
         }
     }
+
+    It "Handles raw input and string arrays the same way" -TestCases @(
+        @{ InputObject = [string[]]@(
+            "key:"
+            "  value1: 1"
+            "  value2:"
+            "  - 1"
+            "  - 2"
+            )
+        }
+        @{ InputObject = @"
+key:
+  value1: 1
+  value2:
+  - 1
+  - 2
+"@
+        }
+    ) {
+        $object = $InputObject | ConvertFrom-Yaml -AsHashtable
+
+        $object.Contains('key') | Should -Be $true
+        $object.key.Contains('value1') | Should -Be $true
+        $object.key.value1 | Should -Be 1
+        $object.key.Contains('value2') | Should -Be $true
+        $object.key.value2 | Should -HaveCount 2
+        $object.key.value2 | Should -be @(1, 2)
+    }
 }
 
 Describe "ConvertTo-Yaml - parser tests" {
