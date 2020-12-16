@@ -254,8 +254,10 @@ Describe "ConvertFrom-Yaml" {
             @{ Value = '-1.1'; Type = 'System.Double' }
             @{ Value = '1.1.1'; Type = 'System.String' }
             @{ Value = 'true'; Type = 'System.Boolean' }
+            @{ Value = '"true"'; Type = 'System.String' }
             @{ Value = 'False'; Type = 'System.Boolean' }
             @{ Value = '2001-12-15T02:59:43.1Z'; Type = 'System.String' }
+            @{ Value = '"null"'; Type = 'System.String' }
         ) {
             ConvertFrom-Yaml $value | Should -BeOfType $type
         }
