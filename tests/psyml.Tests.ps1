@@ -452,4 +452,25 @@ Describe "ConvertTo-Yaml" {
             ConvertTo-Yaml $value | Should -Match $String
         }
     }
+
+    It "Uses the literal style when converting multiline string" {
+        $string = @"
+Line1
+Line2
+Line3
+Line4
+
+"@
+
+        $expectedResult = @"
+|
+  Line1
+  Line2
+  Line3
+  Line4
+
+"@
+
+        $string | ConvertTo-Yaml | Should -Be $expectedResult
+    }
 }

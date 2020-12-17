@@ -111,7 +111,9 @@ namespace psyml
             else if (
                 context.ScalarsAsStrings ||
                 scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
-                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.Literal) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.Folded)
             )
             {
                 return scalar.Value.ToString();

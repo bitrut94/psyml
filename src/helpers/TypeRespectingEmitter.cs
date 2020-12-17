@@ -68,6 +68,10 @@ namespace psyml
                         {
                             eventInfo.Style = ScalarStyle.DoubleQuoted;
                         }
+                        if (((String)value).Contains(Environment.NewLine))
+                        {
+                            eventInfo.Style = ScalarStyle.Literal;
+                        }
                         break;
 
                     case TypeCode.DateTime:
