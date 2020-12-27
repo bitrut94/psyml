@@ -254,8 +254,10 @@ Describe "ConvertFrom-Yaml" {
             @{ Value = '-1.1'; Type = 'System.Double' }
             @{ Value = '1.1.1'; Type = 'System.String' }
             @{ Value = 'true'; Type = 'System.Boolean' }
+            @{ Value = '"true"'; Type = 'System.String' }
             @{ Value = 'False'; Type = 'System.Boolean' }
             @{ Value = '2001-12-15T02:59:43.1Z'; Type = 'System.String' }
+            @{ Value = '"null"'; Type = 'System.String' }
         ) {
             ConvertFrom-Yaml $value | Should -BeOfType $type
         }
@@ -266,6 +268,34 @@ Describe "ConvertFrom-Yaml" {
         ) {
             ConvertFrom-Yaml $value | Should -BeOfType $type
         }
+    }
+
+    It "Handles raw input and string arrays the same way" -TestCases @(
+        @{ InputObject = [string[]]@(
+            "key:"
+            "  value1: 1"
+            "  value2:"
+            "  - 1"
+            "  - 2"
+            )
+        }
+        @{ InputObject = @"
+key:
+  value1: 1
+  value2:
+  - 1
+  - 2
+"@
+        }
+    ) {
+        $object = $InputObject | ConvertFrom-Yaml -AsHashtable
+
+        $object.Contains('key') | Should -Be $true
+        $object.key.Contains('value1') | Should -Be $true
+        $object.key.value1 | Should -Be 1
+        $object.key.Contains('value2') | Should -Be $true
+        $object.key.value2 | Should -HaveCount 2
+        $object.key.value2 | Should -be @(1, 2)
     }
 }
 
@@ -421,5 +451,26 @@ Describe "ConvertTo-Yaml" {
         ) {
             ConvertTo-Yaml $value | Should -Match $String
         }
+    }
+
+    It "Uses the literal style when converting multiline string" {
+        $string = @(
+            'Line1'
+            'Line2'
+            'Line3'
+            'Line4'
+            ''
+        ) -join [Environment]::NewLine
+
+        $expectedResult = @(
+            '\|\+?' # workaround as I'm not able to control block chomping indicator
+            '  Line1'
+            '  Line2'
+            '  Line3'
+            '  Line4'
+            ''
+        ) -join [Environment]::NewLine
+
+        $string | ConvertTo-Yaml | Should -Match $expectedResult
     }
 }

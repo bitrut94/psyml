@@ -85,15 +85,7 @@ namespace psyml
                 CultureInfo.InvariantCulture.ToString()
             );
 
-            if (String.IsNullOrEmpty(scalar.Value))
-            {
-                return String.Empty;
-            }
-            else if (String.Equals(scalar.Value.ToLower(), "null"))
-            {
-                return null;
-            }
-            else if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
+            if (!String.IsNullOrEmpty(scalar.Tag) && !context.ScalarsAsStrings)
             {
                 switch (scalar.Tag)
                 {
@@ -117,12 +109,18 @@ namespace psyml
                 }
             }
             else if (
-              context.ScalarsAsStrings ||
-              scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
-              scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted)
-          )
+                context.ScalarsAsStrings ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.SingleQuoted) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.DoubleQuoted) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.Literal) ||
+                scalar.Style.Equals(YamlDotNet.Core.ScalarStyle.Folded)
+            )
             {
                 return scalar.Value.ToString();
+            }
+            else if (String.Equals(scalar.Value.ToLower(), "null"))
+            {
+                return null;
             }
             else
             {
@@ -323,7 +321,8 @@ namespace psyml
                 if (
                     input as IEnumerable == null &&
                     input as IDictionary == null
-                ) {
+                )
+                {
                     // it might be pscustomobject
                     input = pso;
                 }

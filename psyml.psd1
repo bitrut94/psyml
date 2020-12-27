@@ -30,7 +30,7 @@ CompanyName = 'Lukasz Burak'
 Copyright = '(c) Lukasz Burak. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'YAML PowerShell module'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -90,8 +90,14 @@ AliasesToExport = @()
 FileList = @(
     'psyml.psd1',
     'psyml.psm1',
-    'psyml.dll',
-    'YamlDotNet.dll'
+    'net4.8/psyml.dll',
+    'net4.8/YamlDotNet.dll'
+    'net4.8/psyml.dll-Help.xml'
+    'net4.8/psyml.xml',
+    'netstandard2.1/psyml.dll',
+    'netstandard2.1/YamlDotNet.dll'
+    'netstandard2.1/psyml.dll-Help.xml'
+    'netstandard2.1/psyml.xml'
 )
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
@@ -117,7 +123,7 @@ PrivateData = @{
         # ReleaseNotes = ''
 
         # Prerelease string of this module
-        # Prerelease = ''
+        PreRelease = 'preview'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update/save
         # RequireLicenseAcceptance = $false

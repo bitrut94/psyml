@@ -64,7 +64,10 @@ namespace psyml
                     case TypeCode.String:
                     case TypeCode.Char:
                         eventInfo.RenderedValue = value.ToString()!;
-                        if (CouldValueBeMissconverted(value.ToString()))
+                        if (((String)value).Contains(Environment.NewLine))
+                        {
+                            eventInfo.Style = ScalarStyle.Literal;
+                        } else if (CouldValueBeMissconverted(value.ToString()))
                         {
                             eventInfo.Style = ScalarStyle.DoubleQuoted;
                         }
