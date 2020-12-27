@@ -463,7 +463,7 @@ Describe "ConvertTo-Yaml" {
         ) -join [Environment]::NewLine
 
         $expectedResult = @(
-            '\|\+.?' # workaround as I'm not able to control block chomping indicator
+            '\|\+?' # workaround as I'm not able to control block chomping indicator
             '  Line1'
             '  Line2'
             '  Line3'
