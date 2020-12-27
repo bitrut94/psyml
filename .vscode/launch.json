@@ -9,6 +9,10 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
+            "windows": {
+                "program": "powershell",
+                "type": "clr"
+            },
             "program": "pwsh",
             "args": [
                 "-NoExit",

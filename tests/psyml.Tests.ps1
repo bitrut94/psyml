@@ -462,15 +462,15 @@ Describe "ConvertTo-Yaml" {
             ''
         ) -join [Environment]::NewLine
 
-        $expectedResult = @"
-|
-  Line1
-  Line2
-  Line3
-  Line4
+        $expectedResult = @(
+            '\|\+.?' # workaround as I'm not able to control block chomping indicator
+            '  Line1'
+            '  Line2'
+            '  Line3'
+            '  Line4'
+            ''
+        ) -join [Environment]::NewLine
 
-"@
-
-        $string | ConvertTo-Yaml | Should -Be $expectedResult
+        $string | ConvertTo-Yaml | Should -Match $expectedResult
     }
 }
