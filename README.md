@@ -11,30 +11,30 @@ If some value is wrapped in single or double quotes in YAML string it is still a
 As the examples are better than elaborates, this is the desired behavior:
 
 ```powershell
-$yaml = 'key: "True"'
-$object = ConvertFrom-Yaml $yaml
-$object.key.GetType()
+PS /> $yaml = 'key: "True"'
+PS /> $object = ConvertFrom-Yaml $yaml
+PS /> $object.key.GetType()
 
 IsPublic IsSerial Name                                     BaseType
 -------- -------- ----                                     --------
 True     True     String                                   System.Object
 
-$object | ConvertTo-Yaml
+PS /> $object | ConvertTo-Yaml
 key: "True"
 ```
 
 and this is not:
 
 ```powershell
-$yaml = 'key: "True"'
-$object = ConvertFrom-Yaml $yaml
-$object.key.GetType()
+PS /> $yaml = 'key: "True"'
+PS /> $object = ConvertFrom-Yaml $yaml
+PS /> $object.key.GetType()
 
 IsPublic IsSerial Name                                     BaseType
 -------- -------- ----                                     --------
 True     True     Boolean                                  System.ValueType
 
-$object | ConvertTo-Yaml
+PS /> $object | ConvertTo-Yaml
 key: true
 ```
 
@@ -82,7 +82,6 @@ PS /> $object = @{
     }
 }
 PS /> ConvertTo-Yaml $object
-
 property: value1
 nested:
   bool: true
@@ -111,7 +110,6 @@ PS /> $object = @{
     }
 }
 PS /> ConvertTo-Yaml $object -JsonCompatible
-
 {"property": "value1", "nested": {"bool": true, "string": "True"}, "array": [1, 2, 3]}
 ```
 
@@ -171,17 +169,6 @@ True     True     OrderedDictionary                        System.Object
 ## Reporting Issues and Feedback
 
 To report issue, bug or feature request please use the [Issues page][GitHubIssues]
-
-## TODO
-
-- [ ] release pipeline and first published version in PowerShell Gallery
-- [ ] update cmdlet usage examples
-- [ ] yaml tag handling
-- [ ] `System.DateTime` and `System.Version` types handling
-- [ ] `Test-Yaml` cmdlet
-- [ ] `-NoEnumerate` should be fixed
-
-
 
 <!-- References -->
 
