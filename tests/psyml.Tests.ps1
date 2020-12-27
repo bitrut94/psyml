@@ -454,13 +454,13 @@ Describe "ConvertTo-Yaml" {
     }
 
     It "Uses the literal style when converting multiline string" {
-        $string = @"
-Line1
-Line2
-Line3
-Line4
-
-"@
+        $string = @(
+            'Line1'
+            'Line2'
+            'Line3'
+            'Line4'
+            ''
+        ) -join [Environment]::NewLine
 
         $expectedResult = @"
 |
