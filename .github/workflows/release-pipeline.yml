@@ -3,14 +3,91 @@ name: Release pipeline
 on:
   release:
     types: [created]
-  workflow_dispatch:
 
 jobs:
   build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.301
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build netstandard2.1
+        run: dotnet build --configuration Release --no-restore --framework netstandard2.1
+      - name: Build net4.8
+        run: dotnet build --configuration Release --no-restore --framework net4.8
+      - name: Copy .xml files to netstandard2.1 output directory # as XmlDoc2CmdletDoc works currently only on net4.8
+        shell: pwsh
+        run: |
+          Get-ChildItem ./artifacts/net4.8 -Filter *.xml | Copy-Item -Destination ./artifacts/netstandard2.1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: psyml
+          path: artifacts/
+
+  # test:
+  #   strategy:
+  #     matrix:
+  #       os: [windows-latest, ubuntu-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   needs: build
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@master
+  #       with:
+  #         name: psyml
+  #         path: psyml
+  #     # it seems that shell parameter cannot be parametrized
+  #     - name: Perform Pester tests
+  #       if: matrix.os == 'ubuntu-latest'
+  #       shell: pwsh
+  #       run: |
+  #         Import-Module ./psyml/psyml
+  #         $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
+
+  #         if ($tests.Failed.Count -gt 0) {
+  #           Write-Error "There were $($tests.Failed.Count) errors total." -ErrorAction Stop
+  #         } else {
+  #           Write-Output "There were $($tests.Failed.Count) errors total."
+  #         }
+  #     - name: Perform Pester tests
+  #       if: matrix.os == 'windows-latest'
+  #       shell: powershell
+  #       run: |
+  #         Import-Module ./psyml/psyml
+  #         $tests = Invoke-Pester -Path ./tests/psyml.Tests.ps1 -Show Describe -PassThru
+
+  #         if ($tests.Failed.Count -gt 0) {
+  #           Write-Error "There were $($tests.Failed.Count) errors total." -ErrorAction Stop
+  #         } else {
+  #           Write-Output "There were $($tests.Failed.Count) errors total."
+  #         }
+
+  publish:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@master
+        with:
+          name: psyml
+          path: psyml
       - name: Run a multi-line script
+        shell: pwsh
         run: |
-          git tag --points-at HEAD
+          $version = git tag --points-at HEAD
+          $privateData = Import-PowerShellDataFile ./psyml/psyml.psd1 | Select-Object -ExpandProperty PrivateData
+          $privateData.PSData.Prerelease = $version.Split('-')[1]
+          $files = Get-ChildItem -Recurse ./psyml/ | Resolve-Path -Relative
+          Update-ModuleManifest -Path ./psyml/psyml.psd1 -ModuleVersion $version.Split('-')[0] -PrivateData $privateData -FileList $files
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: psyml
+          path: artifacts/
