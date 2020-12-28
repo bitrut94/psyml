@@ -1,0 +1,14 @@
+name: Release pipeline
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run a multi-line script
+        run: |
+          git tag --points-at HEAD
