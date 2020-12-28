@@ -84,7 +84,7 @@ jobs:
           $version = git tag --points-at HEAD
           $privateData = Import-PowerShellDataFile ./psyml/psyml.psd1 | Select-Object -ExpandProperty PrivateData
           $privateData.PSData.Prerelease = $version.Split('-')[1]
-          $files = Get-ChildItem -Recurse ./psyml/ | Resolve-Path -Relative
+          $files = Get-ChildItem -Recurse ./psyml/ -File | Resolve-Path -Relative
           Update-ModuleManifest -Path ./psyml/psyml.psd1 -ModuleVersion $version.Split('-')[0] -PrivateData $privateData -FileList $files
       - name: Upload artifact
         uses: actions/upload-artifact@v2
