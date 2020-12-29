@@ -10,7 +10,7 @@ $parameters = @{
 }
 
 if ($version.Split('-').Count -gt 1) {
-    # e.g. 1.0.0-preview.0
+    # e.g. 1.0.0-preview0
     $parameters['Prerelease'] = $version.Split('-')[1]
 }
 
