@@ -13,6 +13,47 @@ namespace psyml
     ///     a YAML-formatted string to a YAML object, which is easily managed in PowerShell.
     /// </para>
     /// </summary>
+    /// <example>
+    ///     <para>Convert object to YAML string</para>
+    ///     <para>
+    ///         This command uses the ConvertTo-Yaml cmdlet to convert a GregorianCalendar object to a YAML-formatted string.
+    ///     </para>
+    ///     <code>
+    ///         PS > (Get-UICulture).Calendar | ConvertTo-Yaml
+    ///         MinSupportedDateTime: 0001-01-01T00:00:00.0000000
+    ///         MaxSupportedDateTime: 9999-12-31T23:59:59.9999999
+    ///         AlgorithmType: SolarCalendar
+    ///         CalendarType: Localized
+    ///         Eras:
+    ///         - 1
+    ///         TwoDigitYearMax: 2029
+    ///         IsReadOnly: true
+    ///     </code>
+    /// </example>
+    /// <example>
+    ///     <para>Convert object to list of YAML strings</para>
+    ///     <code>
+    ///         PS > 1 | ConvertTo-Yaml
+    ///         1
+    ///         PS > 1 | ConvertTo-Yaml -AsArray
+    ///         - 1
+    ///     </code>
+    ///     <para>
+    ///         This example shows the output from ConvertTo-Yaml cmdlet with and without the AsArray switch parameter.
+    ///         You can see the second output is preceded by the dash.
+    ///     </para>
+    /// </example>
+    /// <example>
+    ///     <para>Convert object to JSON compatible YAML strings</para>
+    ///     <code>
+    ///         PS > @{key = 'value'} | ConvertTo-Yaml -JsonCompatible
+    ///         {"key": "value"}
+    ///     </code>
+    ///     <para>
+    ///         This example shows the output from ConvertTo-Yaml cmdlet with the JsonCompatible switch parameter.
+    ///         You can see that the output is compatible with the JSON format.
+    ///     </para>
+    /// </example>
     [Cmdlet(VerbsData.ConvertTo, "Yaml")]
     public class ConvertToYamlCommand : PSCmdlet
     {

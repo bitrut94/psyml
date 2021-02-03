@@ -234,6 +234,19 @@ namespace psyml
 
             foreach (var node in mapping)
             {
+                if (output.Properties.Match(node.Key.ToString()).Count > 0) {
+                    context.Cmdlet.WriteError(
+                        new ErrorRecord(
+                            new InvalidOperationException(
+                                "Cannot convert the YAML string because it contains keys with different casing. Please use the -AsHashTable switch instead."
+                            ),
+                            "DuplicateKeysInYamlString",
+                            ErrorCategory.InvalidOperation,
+                            null
+                        )
+                    );
+                    return null;
+                }
                 output.Properties.Add(
                     new PSNoteProperty(
                         node.Key.ToString(),
@@ -331,10 +344,14 @@ namespace psyml
             {
                 return input;
             }
+            else if (t.IsEnum) {
+                return input.ToString();
+            }
             else if (
               input as IEnumerable == null &&
-              input as IDictionary == null
-          )
+              input as IDictionary == null &&
+              pso != null
+            )
             {
                 // it might be pscustomobject
                 input = pso;
