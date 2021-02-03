@@ -272,11 +272,11 @@ Describe "ConvertFrom-Yaml" {
 
     It "Handles raw input and string arrays the same way" -TestCases @(
         @{ InputObject = [string[]]@(
-            "key:"
-            "  value1: 1"
-            "  value2:"
-            "  - 1"
-            "  - 2"
+                "key:"
+                "  value1: 1"
+                "  value2:"
+                "  - 1"
+                "  - 2"
             )
         }
         @{ InputObject = @"
@@ -450,6 +450,11 @@ Describe "ConvertTo-Yaml" {
             @{ Value = '2001-12-15T02:59:43.1Z'; String = '"2001-12-15T02:59:43.1Z"' }
         ) {
             ConvertTo-Yaml $value | Should -Match $String
+        }
+
+        It "Handles -AsArray parameter" {
+            1 | ConvertTo-Yaml | Should -Match '1'
+            1 | ConvertTo-Yaml -AsArray | Should -Match '- 1'
         }
     }
 
