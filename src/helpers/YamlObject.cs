@@ -331,10 +331,14 @@ namespace psyml
             {
                 return input;
             }
+            else if (t.IsEnum) {
+                return input.ToString();
+            }
             else if (
               input as IEnumerable == null &&
-              input as IDictionary == null
-          )
+              input as IDictionary == null &&
+              pso != null
+            )
             {
                 // it might be pscustomobject
                 input = pso;
