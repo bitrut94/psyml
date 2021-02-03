@@ -1,3 +1,6 @@
+// Based on JsonEventEmitter from YamlDotNet library by aaubry
+// https://github.com/aaubry/YamlDotNet
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
