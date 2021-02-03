@@ -91,8 +91,8 @@ namespace psyml
         private void ConvertToYamlHelper(object input)
         {
             var context = new YamlObject.ConvertToYamlContext(
-                disableAliases: EnableAliases,
-                jsonCompatible: JsonCompatible
+                disableAliases: !EnableAliases.IsPresent,
+                jsonCompatible: JsonCompatible.IsPresent
             );
 
             object yaml = YamlObject.ConvertToYaml(input, context);
