@@ -234,6 +234,19 @@ namespace psyml
 
             foreach (var node in mapping)
             {
+                if (output.Properties.Match(node.Key.ToString()).Count > 0) {
+                    context.Cmdlet.WriteError(
+                        new ErrorRecord(
+                            new InvalidOperationException(
+                                "Cannot convert the YAML string because it contains keys with different casing. Please use the -AsHashTable switch instead."
+                            ),
+                            "DuplicateKeysInYamlString",
+                            ErrorCategory.InvalidOperation,
+                            null
+                        )
+                    );
+                    return null;
+                }
                 output.Properties.Add(
                     new PSNoteProperty(
                         node.Key.ToString(),

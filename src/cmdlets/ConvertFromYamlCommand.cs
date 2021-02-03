@@ -15,6 +15,49 @@ namespace psyml
     /// </para>
     /// </summary>
     /// <example>
+    ///     <para>Convert a YAML string to a custom object</para>
+    ///     <para>
+    ///         This example shows how to use the ConvertFrom-Yaml cmdlet to convert a YAML file to a PowerShell custom object.
+    ///     </para>
+    ///     <code>
+    ///         PS > Get-Content YamlFile.yml | ConvertFrom-Yaml
+    ///     </code>
+    ///     <para>
+    ///         The command uses Get-Content cmdlet to get the strings in a YAML file. Then it uses the pipeline operator to send the delimited string to the ConvertFrom-Json cmdlet,
+    ///         which converts it to a custom object.
+    ///     </para>
+    /// </example>
+    /// <example>
+    ///     <para>Convert a YAML string to a hash table</para>
+    ///     <para>
+    ///         This command shows an example where the -AsHashtable switch can overcome limitations of the command.
+    ///     </para>
+    ///     <code>
+    ///         PS > @"
+    ///         key: value1
+    ///         Key: value2
+    ///         "@ | ConvertFrom-Yaml -AsHashtable
+    ///     </code>
+    ///     <para>
+    ///         The YAML string contains two key value pairs with keys that differ only in casing. Without the switch, the command would have thrown an error.
+    ///     </para>
+    /// </example>
+    /// <example>
+    ///     <para>Convert a YAML string to a ordered dictionary</para>
+    ///     <para>
+    ///         This command shows an example where the -AsOrderedDictionary switch can overcome limitations of the command while preserving order of keys.
+    ///     </para>
+    ///     <code>
+    ///         PS > @"
+    ///         key: value1
+    ///         Key: value2
+    ///         "@ | ConvertFrom-Yaml -AsOrderedDictionary
+    ///     </code>
+    ///     <para>
+    ///         The YAML string contains two key value pairs with keys that differ only in casing. Without the switch, the command would have thrown an error.
+    ///     </para>
+    /// </example>
+    /// <example>
     ///     <para>Convert a DateTime object to a YAML object</para>
     ///     <para>
     ///         This command uses the ConvertTo-Yaml and ConvertFrom-Yaml cmdlets to convert a DateTime object from the Get-Date cmdlet to a Yaml object then to a PSCustomObject.
@@ -41,6 +84,22 @@ namespace psyml
     ///     <para>
     ///         The example uses the Select-Object cmdlet to get all of the properties of the DateTime object. It uses the ConvertTo-Yaml cmdlet to convert the DateTime object
     ///         to a string formatted as a YAML object and the ConvertFrom-Yaml cmdlet to convert the YAML-formatted string to a PSCustomObject object.
+    ///     </para>
+    /// </example>
+    /// <example>
+    ///     <para>Round-trip a single element array</para>
+    ///     <para>
+    ///         This command shows an example where the -NoEnumerate switch is used to round-trip a single element YAML array.
+    ///     </para>
+    ///     <code>
+    ///         PS > '- 1' | ConvertFrom-Yaml | ConvertTo-Yaml
+    ///         1
+    ///         PS > '- 1' | ConvertFrom-Yaml -NoEnumerate | ConvertTo-Yaml
+    ///         - 1
+    ///     </code>
+    ///     <para>
+    ///         The YAML string contains an array with a single element. Without the switch, converting the YAML to a PSObject and then converting it back
+    ///         with the ConvertTo-Yaml command results in a single integer.
     ///     </para>
     /// </example>
     [Cmdlet(VerbsData.ConvertFrom, "Yaml")]
