@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Management.Automation;
+using System.Management.Automation.Internal;
 using System.Threading;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
@@ -310,22 +311,33 @@ namespace psyml
 
         private static object PopulateFromObject(object input)
         {
-            var pso = input as PSObject;
+            if (input == null || input == AutomationNull.Value)
+            {
+                return null;
+            }
+
+            PSObject pso = input as PSObject;
 
             if (
                 pso != null
             )
             {
                 input = pso.BaseObject;
+            }
 
-                if (
-                    input as IEnumerable == null &&
-                    input as IDictionary == null
-                )
-                {
-                    // it might be pscustomobject
-                    input = pso;
-                }
+            Type t = input.GetType();
+
+            if (t.IsPrimitive)
+            {
+                return input;
+            }
+            else if (
+              input as IEnumerable == null &&
+              input as IDictionary == null
+          )
+            {
+                // it might be pscustomobject
+                input = pso;
             }
 
             switch (input)

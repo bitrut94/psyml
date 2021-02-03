@@ -55,6 +55,14 @@ namespace psyml
         public SwitchParameter EnableAliases { get; set; }
 
         /// <summary>
+        /// <para type="description">
+        ///     Forces the output to be array type.
+        /// </para>
+        /// </summary>
+        [Parameter]
+        public SwitchParameter AsArray { get; set; }
+
+        /// <summary>
         ///     Buffers InputObjet contents available in the pipeline.
         /// </summary>
         protected override void ProcessRecord()
@@ -69,7 +77,7 @@ namespace psyml
         {
             if (_inputObjectBuffer.Count > 0)
             {
-                object objectToProcess = (_inputObjectBuffer.Count > 1)
+                object objectToProcess = (_inputObjectBuffer.Count > 1 || AsArray.IsPresent)
                 ? (_inputObjectBuffer.ToArray() as object) : _inputObjectBuffer[0];
 
                 ConvertToYamlHelper(objectToProcess);
@@ -83,8 +91,8 @@ namespace psyml
         private void ConvertToYamlHelper(object input)
         {
             var context = new YamlObject.ConvertToYamlContext(
-                disableAliases: EnableAliases,
-                jsonCompatible: JsonCompatible
+                disableAliases: !EnableAliases.IsPresent,
+                jsonCompatible: JsonCompatible.IsPresent
             );
 
             object yaml = YamlObject.ConvertToYaml(input, context);
