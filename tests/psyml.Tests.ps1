@@ -243,6 +243,11 @@ Describe "ConvertFrom-Yaml" {
             if ($Parameter -ne $null) { $params += @{$Parameter = $true } }
             ConvertFrom-Yaml @params | Should -BeOfType $type
         }
+
+        It "Handles -NoEnumerate switch" {
+            '- 1' | ConvertFrom-Yaml | Should -BeOfType System.Int32
+            '- 1' | ConvertFrom-Yaml -NoEnumerate | Should -BeOfType System.Object[]
+        }
     }
 
     Context "Data types" {
