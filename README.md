@@ -1,5 +1,8 @@
 # psyml
 
+![PowerShell Gallery Version][PowerShellGallery]
+![Build status][Build]
+
 YAML PowerShell module
 
 This PowerShell module is a wrapper on top of [YamlDotNet][YamlDotNet] that serializes and deserializes PowerShell objects to and from YAML.  
@@ -177,3 +180,7 @@ To report issue, bug or feature request please use the [Issues page][GitHubIssue
 
 <!-- External -->
 [YamlDotNet]: https://github.com/aaubry/YamlDotNet
+[PowerShellGallery]: https://img.shields.io/powershellgallery/v/psyml?style=flat-square
+[Build]: https://img.shields.io/github/workflow/status/bitrut94/psyml/Release%20pipeline?style=flat-square
+[DotNetFramework]: https://dotnet.microsoft.com/download/dotnet-framework-runtime
+[PowerShellCore]: https://github.com/PowerShell/PowerShell/releases/latest
