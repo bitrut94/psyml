@@ -5,17 +5,17 @@
     <AssemblyName>psyml</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>9.0</LangVersion>
-    <GenerateDocumentationFile Condition="'$(OS)' == 'Windows_NT'">true</GenerateDocumentationFile>
+    <!-- <GenerateDocumentationFile Condition="'$(OS)' == 'Windows_NT'">true</GenerateDocumentationFile> -->
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.4.0-dotnetcore0001" Condition="'$(OS)' == 'Windows_NT'">
+    <!-- <PackageReference Include="XmlDoc2CmdletDoc" Version="0.3.0" Condition="'$(OS)' == 'Windows_NT'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    </PackageReference> -->
     <PackageReference Include="YamlDotNet" Version="9.1.0" />
   </ItemGroup>
 
@@ -25,9 +25,13 @@
     <ItemGroup>
       <OutputAssembly Include="$(TargetDir)\$(AssemblyName).dll" />
       <OutputAssembly Include="$(TargetDir)\YamlDotNet.dll" />
-      <OutputAssembly Include="$(TargetDir)\*.xml" />
+      <!-- <OutputAssembly Include="$(TargetDir)\*.xml" /> -->
     </ItemGroup>
     <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts" />
+
+    <!-- workaround as XmlDoc2CmdletDoc is not supporting dotnet core -->
+    <Copy SourceFiles="psyml.dll-Help.xml" DestinationFolder="artifacts" />
+    <Copy SourceFiles="psyml.xml" DestinationFolder="artifacts" />
   </Target>
 
 </Project>
