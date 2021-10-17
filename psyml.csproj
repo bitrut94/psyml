@@ -12,7 +12,7 @@
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.3.0" Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.4.0-dotnetcore0001" Condition="'$(OS)' == 'Windows_NT'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
