@@ -1,18 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net4.8</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
     <AssemblyName>psyml</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <LangVersion>8.0</LangVersion>
-    <GenerateDocumentationFile Condition="$(TargetFramework) == 'net4.8'">true</GenerateDocumentationFile>
+    <LangVersion>9.0</LangVersion>
+    <GenerateDocumentationFile Condition="'$(OS)' == 'Windows_NT'">true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.3.0" Condition="$(TargetFramework) == 'net4.8'">
+    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.3.0" Condition="'$(OS)' == 'Windows_NT'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -27,7 +27,7 @@
       <OutputAssembly Include="$(TargetDir)\YamlDotNet.dll" />
       <OutputAssembly Include="$(TargetDir)\*.xml" />
     </ItemGroup>
-    <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts\$(TargetFramework)" />
+    <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts" />
   </Target>
 
 </Project>
