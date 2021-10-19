@@ -17,17 +17,17 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: 5.0.x
       - name: Install dependencies
         run: dotnet restore
-      - name: Build netstandard2.1
-        run: dotnet build --configuration Release --no-restore --framework netstandard2.1
+      - name: Build net5.0
+        run: dotnet build --configuration Release --no-restore --framework net5.0
       - name: Build net4.8
         run: dotnet build --configuration Release --no-restore --framework net4.8
-      - name: Copy .xml files to netstandard2.1 output directory # as XmlDoc2CmdletDoc works currently only on net4.8
+      - name: Copy .xml files to net5.0 output directory # as XmlDoc2CmdletDoc works currently only on net4.8
         shell: pwsh
         run: |
-          Get-ChildItem ./artifacts/net4.8 -Filter *.xml | Copy-Item -Destination ./artifacts/netstandard2.1
+          Get-ChildItem ./artifacts/net4.8 -Filter *.xml | Copy-Item -Destination ./artifacts/net5.0
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:

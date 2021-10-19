@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net4.8</TargetFrameworks>
+    <TargetFrameworks>net5.0;net4.8</TargetFrameworks>
     <AssemblyName>psyml</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <GenerateDocumentationFile Condition="$(TargetFramework) == 'net4.8'">true</GenerateDocumentationFile>
   </PropertyGroup>
 
