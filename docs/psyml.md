@@ -1,19 +1,18 @@
 ﻿---
 Module Name: psyml
 Module Guid: a88e2e67-a937-4d98-a4d3-0b03d3ade169
-Download Help Link: {{ Update Download Link }}
-Help Version: {{ Please enter version of help manually (X.X.X.X) format }}
+Download Help Link: https://github.com/bitrut94/psyml
+Help Version: 1.0.0
 Locale: en-US
 ---
 
 # psyml Module
 ## Description
-{{ Fill in the Description }}
+YAML PowerShell module
 
 ## psyml Cmdlets
 ### [ConvertFrom-Yaml](ConvertFrom-Yaml.md)
-{{ Fill in the Description }}
+Converts a YAML-formatted string to a custom object, hash table or ordered dictionary.
 
 ### [ConvertTo-Yaml](ConvertTo-Yaml.md)
-{{ Fill in the Description }}
-
+Converts an object to a YAML-formatted string.
