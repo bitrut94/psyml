@@ -5,16 +5,11 @@
     <AssemblyName>psyml</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>8.0</LangVersion>
-    <GenerateDocumentationFile Condition="$(TargetFramework) == 'net4.8'">true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
       <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.3.0" Condition="$(TargetFramework) == 'net4.8'">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="YamlDotNet" Version="9.1.0" />
   </ItemGroup>
@@ -25,7 +20,6 @@
     <ItemGroup>
       <OutputAssembly Include="$(TargetDir)\$(AssemblyName).dll" />
       <OutputAssembly Include="$(TargetDir)\YamlDotNet.dll" />
-      <OutputAssembly Include="$(TargetDir)\*.xml" />
     </ItemGroup>
     <Copy SourceFiles="@(OutputAssembly)" DestinationFolder="artifacts\$(TargetFramework)" />
   </Target>

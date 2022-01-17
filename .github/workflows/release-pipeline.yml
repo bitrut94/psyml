@@ -19,10 +19,14 @@ jobs:
         run: dotnet build --configuration Release --no-restore --framework netstandard2.1
       - name: Build net4.8
         run: dotnet build --configuration Release --no-restore --framework net4.8
-      - name: Copy .xml files to netstandard2.1 output directory # as XmlDoc2CmdletDoc works currently only on net4.8
+      - name: Generate .dll-Help.xml file
         shell: pwsh
         run: |
-          Get-ChildItem ./artifacts/net4.8 -Filter *.xml | Copy-Item -Destination ./artifacts/netstandard2.1
+          Install-Module platyPS -Force
+          $helpFile = New-ExternalHelp –Path ./docs/ -OutputPath ./
+          'netstandard2.1', 'net4.8' | ForEach-Object {
+            Copy-Item $helpFile "./artifacts/$_" -Force
+          }
       - name: Update module manifest
         shell: pwsh
         run: tools/Update-ModuleManifest.ps1
