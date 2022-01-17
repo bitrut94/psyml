@@ -1,8 +1,7 @@
-
 if ($PSEdition -eq 'Desktop') {
     $loadPath = 'net4.8'
 } else {
-    $loadPath = 'netstandard2.1'
+    $loadPath = 'net5.0'
 }
 
 try {
