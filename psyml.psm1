@@ -1,8 +1,4 @@
-if ($PSEdition -eq 'Desktop') {
-    $loadPath = 'net4.8'
-} else {
-    $loadPath = 'net5.0'
-}
+$loadPath = 'netstandard2.0'
 
 try {
     Add-Type -Path $PSScriptRoot/$loadPath/YamlDotNet.dll `
