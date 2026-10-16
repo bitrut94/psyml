@@ -8,30 +8,25 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+      - uses: actions/checkout@v7
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: 10.0.x
       - name: Install dependencies
         run: dotnet restore
-      - name: Build net5.0
-        run: dotnet build --configuration Release --no-restore --framework net5.0
-      - name: Build net4.8
-        run: dotnet build --configuration Release --no-restore --framework net4.8
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
       - name: Generate .dll-Help.xml file
         shell: pwsh
         run: |
           Install-Module platyPS -Force
-          $helpFile = New-ExternalHelp –Path ./docs/ -OutputPath ./
-          'net5.0', 'net4.8' | ForEach-Object {
-            Copy-Item $helpFile "./artifacts/$_" -Force
-          }
+          New-ExternalHelp -Path ./docs/ -OutputPath ./artifacts/netstandard2.0/
       - name: Update module manifest
         shell: pwsh
         run: tools/Update-ModuleManifest.ps1
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: psyml
           path: artifacts/
@@ -43,9 +38,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Download artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v8
         with:
           name: psyml
           path: psyml
@@ -79,9 +74,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Download artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v8
         with:
           name: psyml
           path: psyml
